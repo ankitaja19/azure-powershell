@@ -115,6 +115,6 @@ if ($PSCmdlet.ParameterSetName -eq 'PullRequestSet') {
 & dotnet --version
 & dotnet new sln -n Azure.PowerShell -o $RepoArtifacts --force
 foreach ($file in $csprojFiles) {
-    & dotnet sln $RepoArtifacts/Azure.PowerShell.sln add "$file"
+    & echo "$([System.DateTime]::Now.ToString()) ----------------dotnet add $file --1"; dotnet sln $RepoArtifacts/Azure.PowerShell.sln add "$file"; echo "$([System.DateTime]::Now.ToString()) ----------------dotnet add $file --2"
 }
 Write-Output "Modules are added to sln file"

@@ -146,50 +146,66 @@
       <Output TaskParameter="SubTasks" PropertyName="SubTasks" />
     </CIFilterTask>
   </Target>
-
+  
+  
   <!-- Build all flavors of the Cmdlets -->
   <Target Name="Build" DependsOnTargets="FilterBuild">
     <Message Importance="high" Text="Building Cmdlets..." />
-
+    <Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------Build 1'"/>
     <MakeDir Directories="$(RepoArtifacts)" />
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------Build 2'"/>
 
     <!-- Copy appropriate targets -->
     <Copy SourceFiles="$(RepoTools)after.Azure.PowerShell.sln.targets" DestinationFolder="$(RepoArtifacts)" />
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------Build 3'"/>
 
     <!-- Build and create package content -->
     <CallTarget Targets="BuildNormalModules" />
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------Build 4'"/>
     <CallTarget Targets="AzToolsPredictor" Condition="$(SubTasks.Contains('Predictor')) OR $(SubTasks.Contains('all'))" />
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------Build 5'"/>
     <CallTarget Targets="AzToolsInstaller" Condition="$(SubTasks.Contains('Installer')) OR $(SubTasks.Contains('all'))" />
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------Build 6'"/>
   </Target>
 
   <Target Name="BuildNormalModules">
+    <Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------BuildNormalModules 1'"/>
     <Exec Condition="$(PullRequestNumber) == '' AND $(TargetModule) == '' AND $(ModifiedModuleBuild) == 'false'"
       Command="$(PowerShellCoreCommandPrefix) &quot;./tools/BuildScripts/BuildModules.ps1 -RepoRoot $(RepoRoot) -Configuration $(Configuration) -TestsToRun $(TestsToRun) -CoreTests $(CoreTests) -RepoArtifacts $(RepoArtifacts) &quot;"
     />
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------BuildNormalModules 2'"/>
     <Exec Condition="$(PullRequestNumber) != ''"
       Command="$(PowerShellCoreCommandPrefix) &quot;./tools/BuildScripts/BuildModules.ps1 -RepoRoot $(RepoRoot) -Configuration $(Configuration) -TestsToRun $(TestsToRun) -CoreTests $(CoreTests) -RepoArtifacts $(RepoArtifacts) -BuildCsprojList '@(BuildCsprojList)' -TestCsprojList '@(TestCsprojList)'&quot;"
     />
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------BuildNormalModules 3'"/>
     <Exec Condition="$(ModifiedModuleBuild) != 'false'"
       Command="$(PowerShellCoreCommandPrefix) &quot;./tools/BuildScripts/BuildModules.ps1 -RepoRoot $(RepoRoot) -Configuration $(Configuration) -TestsToRun $(TestsToRun) -CoreTests $(CoreTests) -RepoArtifacts $(RepoArtifacts) -ModifiedModuleBuild $(ModifiedModuleBuild) &quot;"
     />
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------BuildNormalModules 4'"/>
     <Exec Condition="$(TargetModule) != ''"
       Command="$(PowerShellCoreCommandPrefix) &quot;./tools/BuildScripts/BuildModules.ps1 -RepoRoot $(RepoRoot) -Configuration $(Configuration) -TestsToRun $(TestsToRun) -CoreTests $(CoreTests) -RepoArtifacts $(RepoArtifacts) -TargetModule $(TargetModule)&quot;"
     />
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------BuildNormalModules 5'"/>
     <PropertyGroup>
       <BuildAction Condition="'$(Configuration)' != 'Release'">build</BuildAction>
       <BuildAction Condition="'$(Configuration)' == 'Release'">publish</BuildAction>
     </PropertyGroup>
 
     <Exec Command="$(PowerShellCoreCommandPrefix) &quot;./tools/ExecuteCIStep.ps1 -Build -RepoArtifacts $(RepoArtifacts) -Configuration $(Configuration) -GenerateDocumentationFile $(GenerateDocumentationFile) -EnableTestCoverage $(TurnOnTestCoverage) -BuildAction $(BuildAction)&quot;" Condition="$(PullRequestNumber) == ''"/>
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------BuildNormalModules 6'"/>
     <Exec Command="$(PowerShellCoreCommandPrefix) &quot;./tools/ExecuteCIStep.ps1 -Build -PullRequestNumber $(PullRequestNumber) -RepoArtifacts $(RepoArtifacts) -Configuration $(Configuration) -GenerateDocumentationFile $(GenerateDocumentationFile) -EnableTestCoverage $(TurnOnTestCoverage) -BuildAction $(BuildAction)&quot;" Condition="$(PullRequestNumber) != ''"/>
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------BuildNormalModules 7'"/>
 
     <!-- Build version controller -->
     <Exec Command="dotnet build $(RepoTools)VersionController/VersionController.Netcore.csproj -c $(Configuration)" />
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------BuildNormalModules 8'"/>
 
     <!-- Delete powershell runtime files & .deps.json files -->
     <Exec Command="$(PowerShellCoreCommandPrefix) &quot;. $(RepoTools)BuildScripts/RemoveUnwantedFiles.ps1 -RootPath $(RepoArtifacts)$(Configuration) -CodeSign $(CodeSign)&quot;"/>
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------BuildNormalModules 9'"/>
 
     <Exec Command="$(PowerShellCoreCommandPrefix) &quot;. $(RepoTools)UpdateModules.ps1 -BuildConfig $(Configuration) -Scope $(Scope)&quot;"/>
+	<Exec Command="echo $([System.DateTime]::Now.ToString()) '-------------------------------BuildNormalModules 10'"/>
   </Target>
 
   <Target Name="OnPremChecks" Condition="'$(OnPremiseBuild)'">
