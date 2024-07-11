@@ -172,6 +172,7 @@ If ($Build)
         $buildCmdResult += " -p:TestCoverage=TESTCOVERAGE"
     }
     Invoke-Expression -Command $buildCmdResult
+    Write-Host "----------------------- build step 3"
 
     If (Test-Path -Path "$RepoArtifacts/PipelineResult")
     {
@@ -294,10 +295,10 @@ If ($Build)
         ConvertTo-Json -Depth 10 -InputObject $Template | Out-File -FilePath "$RepoArtifacts/PipelineResult/PipelineResult.json"
         #EndRegion
     }
+    Write-Host "----------------------- build step 4"
     Return
 }
 
-Write-Host "-----------------------after build"
 
 If (Test-Path $CIPlanPath)
 {
