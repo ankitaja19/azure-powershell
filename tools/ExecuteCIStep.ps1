@@ -155,10 +155,14 @@ Function Set-ModuleTestStatusInPipelineResult
 
 $ErrorActionPreference = 'Stop'
 
+Write-Host "-----------------------before build"
+
 If ($Build)
 {
+    Write-Host "----------------------- build step 1"
     $LogFile = "$RepoArtifacts/Build.Log"
-    $buildCmdResult = "dotnet $BuildAction $RepoArtifacts/Azure.PowerShell.sln -c $Configuration -fl '/flp1:logFile=$LogFile;verbosity=quiet'"
+    $buildCmdResult = "dotnet $BuildAction $RepoArtifacts/Azure.PowerShell.sln -c $Configuration -fl '/flp1:logFile=$LogFile;verbosity=detailed'"
+    Write-Host "----------------------- build step 2"
     If ($GenerateDocumentationFile -eq "false")
     {
         $buildCmdResult += " -p:GenerateDocumentationFile=false"
@@ -292,6 +296,8 @@ If ($Build)
     }
     Return
 }
+
+Write-Host "-----------------------after build"
 
 If (Test-Path $CIPlanPath)
 {
